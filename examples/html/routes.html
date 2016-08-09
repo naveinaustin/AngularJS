@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <style>
+  	.filled {
+  		background-color: #ffd;
+  	}
+  	input.ng-invalid.ng-dirty {
+  		border: 1px solid red;
+  	}
+  	.error {
+  		color: red;
+  	}
+  	
+  	ul {
+	    list-style-type: none;
+	}
+  </style>
+  <script src="/angularjs/js/jquery-1.7.1.js"></script>
+  <script src="/angularjs/js/angular.js"></script>
+  <script src="/angularjs/js/angular-route.js"></script>
+  
+  
+<base href="/angularjs/">
+</head>
+<body ng-app="main" class="panel">
+	<a href="allmails">All Mail</a>
+	<a href="mail/1">Mail 1</a>
+	<a href="mail/2">Mail 2</a>
+	<div class="panel-body" ng-view></div>
+	<script>
+	var app = angular.module('main', ['ngRoute']);
+	
+	app.controller('AllMailsController', ['$scope', '$routeParams', 
+	    function($scope, $routeParams){
+			$scope.mails = [{id:1, name: 'mail1', subject: 'Hello'},{id:2, name: 'mail2', subject: 'Hello World'}];
+		}
+	]);
+	
+	app.controller('MailDetailsController', ['$scope', '$routeParams', '$http',
+  	    function($scope, $routeParams, $http){
+			var mailId = $routeParams.mailId;
+			$http({method: 'get', url:'http://demo6220882.mockable.io/'+mailId}).success(function (data) {
+				$scope.mail = data;
+			});
+			/*  $http.get('http://demo6220882.mockable.io/'+mailId).success(function (data) {
+				$scope.mail = data;
+			}); */
+  		/* 	var mailId = $routeParams.mailId;
+  			if(mailId == 1) {
+  				$scope.mail = {name: 'mail1', subject: 'Hello'};
+  			}
+  			else {
+  				$scope.mail = {name: 'mail2', subject: 'Hello World'};
+  			} */
+  		}
+  	]);
+	
+	app.config(function($routeProvider, $locationProvider) {
+		$routeProvider.when('/allmails/', {
+			templateUrl: 'html/allmails.html',
+			controller: 'AllMailsController'
+		});
+		$locationProvider.html5Mode(true);
+	});
+	
+	app.config(function($routeProvider, $locationProvider) {
+		$routeProvider.when('/mail/:mailId', {
+			templateUrl: 'html/mailDetail.html',
+			controller: 'MailDetailsController'
+		});
+		$locationProvider.html5Mode(true);
+	});
+  </script>
+</body>
+</html>
+
+<!-- 
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular.min.js"></script>
+-->

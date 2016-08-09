@@ -1,0 +1,108 @@
+<html ng-app="exampleApp">
+<head>
+<title>Promises</title>
+<link href="../../css/bootstrap.css" rel="stylesheet" />
+<link href="../../css/bootstrap-theme.css" rel="stylesheet" />
+<script src="../../js/jquery-1.7.1.js"></script>
+<script src="../../js/angular.js"></script>
+<script src="../../js/angular-route.js"></script>
+<script src="../../js/angular-resource.js"></script>
+<body>
+<div ng-controller="defaultCtrl">
+	Factory vs Service - {{display}}
+</div>
+<div ng-controller="defaultCtrlTwo">
+	Factory vs Service - {{display}}
+</div>
+</body>
+</html>
+<script>
+	angular.module("common",[])
+		.config(["$provide", function ($provide) {
+	        $provide.decorator("CounterService", ['$delegate', function($delegate) {
+				var getBackup = $delegate.get;
+				
+				$delegate.get = function() {
+					console.log('>>>>>>>>>>>>>>>>>>>> AOP BEFORE <<<<<<<<<<<<<<<<<<<<<<<');
+					var value = getBackup.apply($delegate, arguments);
+					console.log('>>>>>>>>>>>>>>>>>>>> AOP AFTER <<<<<<<<<<<<<<<<<<<<<<<');
+					return value;
+				};
+				
+				return $delegate;
+	        }]);
+	    }])
+		.factory('CounterFactory', function () {
+			var counter = 1;
+			return {
+				get: function () {
+					return counter;
+				},
+				increment: function() {
+					counter++;
+				}
+				
+			};
+		})
+		.service('CounterService', function () {
+			var counter = 1;
+			
+			this.get = function() {
+				return counter;
+			};
+			
+			this.increment = function() {
+				counter++;
+			};
+
+		})
+		.service('StateService', function() {
+			var cache = {};
+			this.put = function(key, data) {
+				cache[key] = data;
+			};
+			
+			this.get = function(key) {
+				return cache[key];
+			}
+		});
+	
+	angular.module("exampleApp", ['common'])
+		.controller("defaultCtrl", function($scope, CounterFactory, CounterService, StateService) {
+			console.log('**************  defaultCtrl  **************');
+			console.log('**************  CounterFactory  **************');
+			console.log(CounterFactory.get());
+			console.log(CounterFactory.increment());
+			console.log(CounterFactory.get());
+			console.log('**************  CounterFactory  **************');
+			
+			
+			console.log('**************  CounterService  **************');
+			console.log(CounterService.get());
+			console.log(CounterService.increment());
+			console.log(CounterService.get());
+			console.log('**************  CounterService  **************');
+			
+			$scope.display="defaultCtrl";
+			
+			console.log("State: " + StateService.get('test'));
+			StateService.put('test', {id: '1', name:'work'});
+		})
+		.controller("defaultCtrlTwo", function($scope, CounterFactory, CounterService, StateService) {
+			console.log('**************  defaultCtrlTwo  **************');
+			console.log('**************  CounterFactory  **************');
+			console.log(CounterFactory.get());
+			console.log(CounterFactory.increment());
+			console.log(CounterFactory.get());
+			console.log('**************  CounterFactory  **************');
+			
+			console.log('**************  CounterService  **************');
+			console.log(CounterService.get());
+			console.log(CounterService.increment());
+			console.log(CounterService.get());
+			console.log('**************  CounterService  **************');
+			
+			$scope.display="defaultCtrlTwo";
+			console.log("State: " + JSON.stringify(StateService.get('test')));
+		});
+</script>

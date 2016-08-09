@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+</head>
+<body ng-app="main">
+	<div ng-controller="TestController">
+		<div contenteditable></div>
+	</div>
+</body>
+</html>
+<script src="../js/lib/jquery-1.7.1.js"></script>
+<script src="../js/lib/angular.js"></script>
+<script src="../js/lib/angular-sanitize.min.js"></script>
+<script type="text/javascript">
+	angular
+		.module('main',[
+			'ngSanitize'
+		])
+		.controller('TestController',['$scope', '$q', '$timeout', TestController]);
+		/*.directive('contenteditable', ['$sce', function($sce) {
+			console.log('directive');
+			return {
+				restrict: 'A',
+				link: function(scope, element, attrs) {
+					console.log('scope: ' + scope);
+					console.log('element: ' + element);
+					console.log('attrs: ' + attrs);
+
+					element.css('color','green');
+					element.on('blur', function(){
+						scope.text = element.text();
+						scope.edit = false;
+						scope.$apply();
+					});
+
+					element.on('click', function(){
+						element.attr('contenteditable', 'true').focus();
+					});
+					
+					console.log($sce);
+				}
+			};
+		}]);*/
+	
+	function TestController($scope, $q, $timeout) {
+		function loadPreviousData() {
+			var deferred = $q.defer();
+			
+			$timeout(function() {
+				//deferred.resolve('loadPreviousData - done');
+				deferred.resolve(0);
+				console.log('loadPreviousData');
+			}, 5000);
+			
+			return deferred.promise;
+		}
+		
+		function loadNextData(index) {
+			var deferred = $q.defer();
+			
+			$timeout(function() {
+				deferred.resolve('loadNextData - done');
+				console.log('loadNextData');
+				
+				if(!index) {
+					index = 0;
+				}
+				if(index === 4) {
+					deferred.resolve('loadNextData - done');
+					$scope.$broadcast('loading-complete');
+				} else {
+					return loadNextData(index + 1);
+				}
+			}, 2000);
+			
+			return deferred.promise;
+		}
+		
+		function scrollToData() {
+			var deferred = $q.defer();
+			
+			$timeout(function() {
+				deferred.resolve('scrollToData - done');
+				console.log('scrollToData');
+			}, 1000);
+			
+			return deferred.promise;
+		}
+		
+	
+		
+		//Runs in any order
+		/*var resultArr = [loadPreviousData, loadNextData];
+		$q.all(resultArr.map(function(funcToExecute){
+			return funcToExecute();
+		})).then(scrollToData);*/
+		
+		//Runs in order
+		/*var resultArr = [loadNextData];
+		resultArr.reduce(function(promise, funcToExecute) {
+			return promise.then(function(result) {
+				return funcToExecute(result);
+			});       
+		}, loadPreviousData()).then(scrollToData);*/
+	
+		
+		/*loadPreviousData().then(loadNextData);
+		
+	  $scope.$on('loading-complete', function (event, args) {
+      scrollToData();
+    });*/
+		
+		loadPreviousData().then(scrollToData).then(loadNextData);
+		
+		//console.log($sce);
+	}
+</script>

@@ -1,0 +1,102 @@
+<html ng-app="exampleApp">
+<head>
+<title>Directive With Function</title>
+<link href="../../css/bootstrap.css" rel="stylesheet" />
+<link href="../../css/bootstrap-theme.css" rel="stylesheet" />
+<script src="../../js/jquery-1.7.1.js"></script>
+<script src="../../js/angular.js"></script>
+<script>
+	angular.module("exampleApp", [])
+		.directive("unorderedList",	function() {
+			return {
+				scope: {
+					data: '=unorderedList',
+					clickFn: '&clickFn'
+				},
+				link : function(scope, element, attrs) {
+						//scope.data = scope[attrs["unorderedList"]];
+						 element.bind("click", function () {
+							 scope.clickFn({param1: 'one', param: 'two'});//{param: 'data'});
+						 });
+				},
+				restrict : "A",
+				template : "<ul><li ng-repeat='item in data'>"
+						+ "{{item.price | currency}}</li></ul>"
+			}
+		})
+		.controller("defaultCtrl", function($scope) {
+			$scope.products = [ {
+				name : "Apples",
+				category : "Fruit",
+				price : 1.20,
+				expiry : 10
+			}, {
+				name : "Bananas",
+				category : "Fruit",
+				price : 2.42,
+				expiry : 7
+			}, {
+				name : "Pears",
+				category : "Fruit",
+				price : 2.02,
+				expiry : 6
+			} ];
+			
+			$scope.clickMe = function(param) {
+				console.log("fruit " + param);
+			};
+		})
+		.controller("defaultCtrl2", function() {
+			var vm = this;
+			vm.products = [ {
+				name : "Apples",
+				category : "Fruit",
+				price : 1.20,
+				expiry : 10
+			}, {
+				name : "Bananas",
+				category : "Fruit",
+				price : 2.42,
+				expiry : 7
+			}, {
+				name : "Pears",
+				category : "Fruit",
+				price : 2.02,
+				expiry : 6
+			} ];
+			
+			vm.clickMe = function(param) {
+				console.log("fruit " + param);
+			};
+		})
+</script>
+</head>
+<body >
+<div ng-controller="defaultCtrl">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3>Products</h3>
+		</div>
+		<div class="panel-body">
+			<div unordered-list="products" click-fn="clickMe(param)">This is where the list will go</div>
+		</div>
+	</div>
+</div>
+
+<div ng-controller="defaultCtrl2 as cont">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3>Products</h3>
+		</div>
+		<div class="panel-body">
+			<div unordered-list="cont.products" click-fn="cont.clickMe(param)">This is where the list will go</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>
+<script type="text/template" id="listTemplate">
+<ul>
+	<li ng-repeat="item in data">{{item.price | currency}}</li>
+</ul>
+</script>

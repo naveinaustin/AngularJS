@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <style>
+  	.main-body {
+  		width: 200px;
+  	}
+  	
+  	.active {
+  		background-color: green;
+  	}
+  	
+  	.select {
+  		background-color: blue;
+  	}
+  </style>
+  <script src="../js/angular.js"></script>
+  <script>
+	var app = angular.module('main', []);
+	
+	app.controller('ItemController', ['$scope', function($scope) {
+		$scope.items = [
+      		{
+      			name: 'shirt',
+      			price: 80,
+				editMode: false
+      		},{
+      			name: 'shoes',
+      			price: 1400,
+				editMode: false
+      		},{
+      			name: 'socks',
+      			price: 100,
+				editMode: false
+      		},{
+      			name: 'watch',
+      			price: 2200,
+				editMode: false
+      		}
+      	];
+	
+		$scope.totalCost = function() {
+			var total = 0;
+			angular.forEach($scope.items, function(item){
+				total+= item.price;
+			});
+			
+			return total;
+		};
+		
+	
+		$scope.count = function () {
+			var total = 0;
+			angular.forEach($scope.items, function(item){
+				total+= 1;
+			});
+			
+			return total;
+		};
+		
+		$scope.edit = function(item) {
+			item.editMode = true;
+		};
+		
+		$scope.editDone = function(item) {
+			item.editMode = false;
+		};
+	}]);	
+  </script>
+</head>
+<body>
+	<div ng-app="main" class="panel panel-body main-body" ng-controller="ItemController" >
+	 	<table class="table table-striped">
+			<tr ng-repeat="item in items" ng-click="toggleSelect(item)">
+				<td>{{item.name}}</td>
+				<td>
+					<span ng-if="!item.editMode">{{item.price|currency}}</span>
+					<span ng-if="item.editMode"><input type="number" value="{{item.price}}" ng-model="item.price"/></span>
+				</td>
+				<td>
+					<span ng-if="!item.editMode"><button ng-click="edit(item)">Edit</button></span>
+					<span ng-if="item.editMode"><button ng-click="editDone(item)">Done</button></span>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">Total <span>{{count()}}</span></td><td>{{totalCost()|currency}}</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

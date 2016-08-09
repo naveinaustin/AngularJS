@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <style>
+  	.filled {
+  		background-color: #ffd;
+  	}
+  	input.ng-invalid.ng-dirty {
+  		border: 1px solid red;
+  	}
+  	.error {
+  		color: red;
+  	}
+  	
+  	ul {
+	    list-style-type: none;
+	}
+  </style>
+  <script src="../js/jquery-1.7.1.js"></script>
+  <script src="../js/angular.js"></script>
+  
+  <script>
+  	/* Solution 1 */
+	var app = angular.module('main', []);
+	
+	app.controller('ContactsController', ['$scope',
+	    function($scope){
+			$scope.contacts = [
+				{name: 'abc'},
+				{name: 'def'}
+			];
+		}
+	]);
+	app.directive('people', function() {
+		return {
+			restrict: 'E',
+			templateUrl: 'people.html'
+		}
+	});
+	app.directive('person', function() {
+		return {
+			restrict: 'E',
+			templateUrl: 'person.html'
+		}
+	});
+	
+	app.directive('people2', function() {
+		return {
+			restrict: 'E',
+			templateUrl: 'people2.html',
+			scope : {
+				pplInfo: '=info'
+			},
+		}
+	});
+	
+	
+  </script>
+</head>
+<body ng-app="main" class="panel">
+	<div class="panel-body" ng-controller="ContactsController" >
+	 	<div ng-repeat="contact in contacts">
+	 		{{contact.name}}
+	 	</div>
+	 	<people></people>
+	 	<div class="panel-body">
+		 	<div ng-repeat="contact in contacts">
+		 		<people2 info='contact'></people2>
+		 	</div>
+		 </div>
+ 	</div>
+</body>
+</html>
+
+<!-- 
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular.min.js"></script>
+-->

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  
+  <style>
+	.main-body {
+		width: 300px;
+	}
+	
+	.main-body button {
+		padding: 40px;
+		font-size: 30px;
+	}
+	
+	.main-body button.cell-show {
+		padding: 21px 32px;
+	}
+  </style>
+  <script src="../js/angular.js"></script>
+  <script>
+	var app = angular.module('GameBoard', []);
+	
+	app.controller('GameBoardController', ['$scope', '$timeout', function($scope, $timeout) {
+		var boardSize = 4;
+		$scope.numberOfClicks = 0;
+		var clicks = 0;
+		var cell1 = {};
+		var cell2 = {};
+	
+		$scope.boardCells = [
+			[{value: 8, found: false, show: false},{value: 7, found: false, show: false},{value: 6, found: false, show: false},{value: 2, found: false, show: false}],
+			[{value: 3, found: false, show: false},{value: 7, found: false, show: false},{value: 3, found: false, show: false},{value: 5, found: false, show: false}],
+			[{value: 4, found: false, show: false},{value: 8, found: false, show: false},{value: 1, found: false, show: false},{value: 6, found: false, show: false}],
+			[{value: 1, found: false, show: false},{value: 2, found: false, show: false},{value: 4, found: false, show: false},{value: 5, found: false, show: false}]
+		];
+		
+		$scope.select = function(cell) {
+			if(!cell.found) {
+				if(cell.show) {
+					clicks--;
+				} else {
+					clicks++;
+				}
+				
+				
+				$scope.numberOfClicks++;
+								
+				if(clicks > 2) {
+					clicks = 1;
+					angular.forEach($scope.boardCells, function(row){
+						angular.forEach(row, function(cell){
+							if(!cell.found) {
+								cell.show = false;
+							}
+						});
+					});
+					
+					cell1 = cell;
+					cell2 = {};
+				} else {
+				
+					if(!cell.show) {
+						if(clicks % 2 === 1) {
+							cell1 = cell;
+						} else {
+							cell2 = cell;
+						}
+						
+						if(cell1.value === cell2.value) {
+							cell1.found = true;
+							cell2.found = true;
+						}
+					}
+				}
+				cell.show = !cell.show;
+				
+			}
+			
+			var cellsFound = 0;
+			angular.forEach($scope.boardCells, function(row){
+				angular.forEach(row, function(cell){
+					if(cell.found) {
+						cellsFound++;
+					}
+				});
+			});
+			
+			if(cellsFound === 16) {
+				$timeout(function () {
+					alert("Game completed in " + $scope.numberOfClicks + " clicks.");				
+				}, 0);
+			}
+			
+		};
+		
+		$scope.reset = function() {
+			angular.forEach($scope.boardCells, function(row){
+				angular.forEach(row, function(cell){
+					cell.show = false;
+					cell.found = false;
+				});
+			});
+			
+			cell1 = {};
+			cell2 = {};
+			
+			$scope.numberOfClicks = 0;
+		};
+		
+	}]);	
+  </script>
+</head>
+<body ng-app="GameBoard" ng-controller="GameBoardController">
+	<div class="panel panel-body main-body"  >
+	 	<table class="table">
+			<tr ng-repeat="row in boardCells">
+				<td ng-repeat="cell in row">
+					<button ng-click="select(cell)" ng-show="!cell.show"></button>
+					<button ng-click="select(cell)" ng-show="cell.show" class="cell-show">{{cell.value}}</button>
+				</td>
+			</tr>
+		</table>
+ 	</div>
+	Number of clicks: {{numberOfClicks}} <button ng-click="reset()">Reset</button>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <style>
+  	.main-body {
+  		width: 200px;
+  	}
+  	
+  	.table {
+  		display: table;
+  	}
+  	
+  	.table-row {
+  		margin-bottom: 10px;
+  		cursor: pointer;
+  	}
+  	
+  	.table-cell {
+  		display: table-cell;
+  		width: 100%;
+  		padding: 5px;
+  		color: white;
+  	}
+  	
+  	.active {
+  		background-color: green;
+  	}
+  	
+  	.select {
+  		background-color: blue;
+  	}
+  </style>
+  <script src="../js/angular.js"></script>
+  <script>
+  	/* Solution 1 */
+	var app = angular.module('main', []);
+	
+	app.controller('ItemController', ['$scope', function($scope) {
+		$scope.items = [
+      		{
+      			name: 'shirt',
+      			price: 80,
+      			active:true
+      		},{
+      			name: 'shoes',
+      			price: 1400,
+      			active:false
+      		},{
+      			name: 'socks',
+      			price: 100,
+      			active:false
+      		},{
+      			name: 'watch',
+      			price: 2200,
+      			active:false
+      		}
+      	];
+	
+		$scope.totalCost = function() {
+			var total = 0;
+			angular.forEach($scope.items, function(item){
+				if (item.active){
+					total+= item.price;
+				}
+			});
+			
+			return total;
+		};
+		
+		$scope.toggleSelect = function(item) {
+			item.active = !item.active;
+		}
+		
+		$scope.count = function () {
+			var total = 0;
+			angular.forEach($scope.items, function(item){
+				if (item.active){
+					total+= 1;
+				}
+			});
+			
+			return total;
+		};
+	}]);	
+  </script>
+</head>
+<body>
+	<div ng-app="main" class="panel panel-body main-body" ng-controller="ItemController" >
+	 	<div class="table">
+			<div ng-repeat="item in items" class="table-row" ng-class="item.active ? 'active' : 'select'" ng-click="toggleSelect(item)">
+				<div class="table-cell">{{item.name}}</div><div class="table-cell">{{item.price|currency}}</div>
+			</div>
+		</div>
+		<div class="table active">
+			<div class="table-row"><div class="table-cell">Total <span>{{count()}}</span></span></div><div class="table-cell">{{totalCost()|currency}}</div></div>
+		</div>
+ 	</div>
+</body>
+</html>

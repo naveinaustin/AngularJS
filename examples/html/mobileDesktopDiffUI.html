@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <style>
+  	.filled {
+  		background-color: #ffd;
+  	}
+  	input.ng-invalid.ng-dirty {
+  		border: 1px solid red;
+  	}
+  	.error {
+  		color: red;
+  	}
+  	
+  	ul {
+	    list-style-type: none;
+	}
+	
+	.mobile-pattern {
+		display: table;
+		border-color: black; 
+		border-style:dashed; 
+		padding: 8px ;
+		width: 250px;
+	}
+	
+	.mobile-pattern-row {
+		display: table-cell;
+		border-color: black; 
+		border-style:dashed; 
+		margin: 8px ;
+		float: left;
+	}
+  </style>
+  <script src="/angularjs/js/jquery-1.7.1.js"></script>
+  <script src="/angularjs/js/angular.js"></script>
+  
+  <script>
+  	/* Solution 1 */
+	var app = angular.module('main', []);
+	
+  	app.controller('testDirectiveController', function($scope) {
+  		$scope.viewFile = function() {
+  			var width = screen.width;
+			var height = screen.height;
+			var key = "DESKTOP";
+
+			if(width < 400 || height < 400) {
+				key = "MOBILE";
+			}
+			
+			return key == "DESKTOP" ? "/angularjs/html/desktop.html": "mobile.html";
+  		};
+  	});
+  	
+	/* app.directive('testDirective', function() {
+		return {
+			restrict: 'E',
+			link: function (scope, element, attrs) {
+				scope.data = [
+				              {id:"1",name:"abc",age:"20",mobile:"8487484"},
+				              {id:"2",name:"xyz",age:"25",mobile:"8464484"},
+				              {id:"3",name:"def",age:"30",mobile:"1948284"}
+				             ];
+			},
+			template: function () {
+				return angular.element(ListFactory.getInstance().getTemplate()).html();
+			}
+		};
+	}); */
+	
+	app.directive('testDirectiveInclude', function() {
+		return {
+			restrict: 'E',
+			link: function (scope, element, attrs) {
+				scope.data = [
+				              {id:"1",name:"abc",age:"20",mobile:"8487484"},
+				              {id:"2",name:"xyz",age:"25",mobile:"8464484"},
+				              {id:"3",name:"def",age:"30",mobile:"1948284"}
+				             ];
+			},
+			template: function () {
+				return angular.element('<div ng-controller="testDirectiveController"><ng-include src="viewFile()"></ng-include</div>').html();
+				//return angular.element(ListFactory.getInstance().getTemplate()).html();
+			}/* ,
+			controller: 'testDirectiveController' */
+		};
+	});
+	
+	var ListFactory = (function() {
+		return {
+			getInstance : function(key) {
+				var list = {};
+				
+				var width = screen.width;
+				var height = screen.height;
+				key = "DESKTOP";
+				
+				console.log(width);
+				console.log(height);
+				if(width < 400 || height < 400) {
+					key = "MOBILE";
+				}
+				
+				if("DESKTOP" === key) {
+					list = new DesktopList();
+				} else if("MOBILE" === key) {
+					list = new MobileList();
+				}
+				return list;
+			}
+		};
+	})();
+	
+	var DesktopList = (function() {
+		return {
+			getTemplate : function() {
+				return document.querySelector("#listDesktopTemplate");
+			}
+		}
+	});
+	var MobileList = (function() {
+		return {
+			getTemplate : function() {
+				return document.querySelector("#listMobileTemplate");
+			}
+		}
+	}); 
+  </script>
+  
+  <script type="text/template" id="listDesktopTemplate">
+		<table class="table">
+			<tr ng-repeat="item in data"><td>{{item.id}}</td><td>{{item.name}}</td><td>{{item.age}}</td><td>{{item.mobile}}</td></tr>
+		</table>
+</script>
+ <script type="text/template" id="listMobileTemplate">
+		<div class="table">
+			<div class="mobile-pattern">
+				<div ng-repeat="item in data" class="mobile-pattern-row"><div >{{item.age}}</div><div style="float:left; width:100px">{{item.mobile}}</div><div style="float:left; width:100px">{{item.name}}</div></div>
+			</div>
+		</div>
+</script>
+</head>
+<body>
+	<div ng-app="main" class="panel-body" >
+	  	<!-- <test-directive/> -->
+	  	<test-directive-include/>
+ 	</div>
+</body>
+</html>

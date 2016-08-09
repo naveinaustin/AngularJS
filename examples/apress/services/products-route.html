@@ -1,0 +1,125 @@
+<html ng-app="exampleApp">
+<head>
+<title>Promises</title>
+<link href="../../css/bootstrap.css" rel="stylesheet" />
+<link href="../../css/bootstrap-theme.css" rel="stylesheet" />
+<script src="../../js/jquery-1.7.1.js"></script>
+<script src="../../js/angular.js"></script>
+<script src="../../js/angular-route.js"></script>
+<script src="../../js/angular-resource.js"></script>
+<body ng-controller="defaultCtrl">
+	<div class="panel panel-primary">
+		<h3 class="panel-heading">Products</h3>
+		<div ng-view></div>
+	</div>
+</body>
+</html>
+<script>
+	angular.module("exampleApp", [ "increment", "ngResource", "ngRoute" ])
+		.constant(
+			"baseUrl", "http://localhost:2403/products/")
+		.config(function ($routeProvider, $locationProvider) {
+			$locationProvider.html5Mode({
+			  enabled: true,
+			  requireBase: false
+			});
+			
+			$routeProvider.when("/list", {
+				templateUrl: "/angularjs/apress/services/tableView.html"
+			});
+			$routeProvider.when("/edit", {
+				templateUrl: "/angularjs/apress/services/editorView.html"
+			});
+			$routeProvider.when("/create", {
+				templateUrl: "/angularjs/apress/services/editorView.html"
+			});
+			$routeProvider.otherwise({
+				templateUrl: "/angularjs/apress/services/tableView.html"
+			});
+		})
+		.controller(
+			"defaultCtrl",
+			function($scope, $http, $resource, baseUrl, $location) {
+				$scope.displayMode = "list";
+				$scope.currentProduct = null;
+				$scope.productsResource = $resource(baseUrl + ":id", {
+					id : "@id"
+				}, {
+					create : {
+						method : "POST"
+					},
+					save : {
+						method : "PUT"
+					}
+				});
+				$scope.listProducts = function() {
+					$scope.products = $scope.productsResource.query();
+				}
+				$scope.deleteProduct = function(product) {
+					product.$delete().then(
+							function() {
+								$scope.products.splice($scope.products
+										.indexOf(product), 1);
+							});
+					$location.path("/list");
+				}
+				$scope.createProduct = function(product) {
+					new $scope.productsResource(product).$create().then(
+							function(newProduct) {
+								$scope.products.push(newProduct);
+								$location.path("/list");
+							});
+				}
+				
+				$scope.editProduct = function (product) {
+					$scope.currentProduct = product;
+					$location.path("/edit");
+				}
+				$scope.updateProduct = function(product) {
+					product.$save();
+					$location.path("/list");
+				}
+				
+				$scope.saveEdit = function(product) {
+					if (angular.isDefined(product.id)) {
+						$scope.updateProduct(product);
+					} else {
+						$scope.createProduct(product);
+					}
+					$scope.currentProduct = {};
+				}
+				$scope.cancelEdit = function() {
+					if ($scope.currentProduct && $scope.currentProduct.$get) {
+						$scope.currentProduct.$get();
+					}
+					$scope.currentProduct = {};
+					$location.path("/list");
+				}
+				$scope.listProducts();
+			});
+
+	angular.module("increment", []).directive("increment", function() {
+		return {
+			restrict : "E",
+			scope : {
+				item : "=item",
+				property : "@propertyName",
+				restful : "@restful",
+				method : "@methodName"
+			},
+			link : function(scope, element, attrs) {
+				var button = angular.element("<button>").text("+");
+				button.addClass("btn btn-primary btn-xs");
+				element.append(button);
+				button.on("click", function() {
+					scope.$apply(function() {
+						scope.item[scope.property]++;
+						if (scope.restful) {
+							scope.item[scope.method]();
+						}
+					})
+				})
+			},
+		}
+	});
+</script>

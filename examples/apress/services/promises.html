@@ -1,0 +1,55 @@
+<html ng-app="exampleApp">
+<head>
+<title>Promises</title>
+<link href="../../css/bootstrap.css" rel="stylesheet" />
+<link href="../../css/bootstrap-theme.css" rel="stylesheet" />
+<script src="../../js/jquery-1.7.1.js"></script>
+<script src="../../js/angular.js"></script>
+<script>
+	angular.module("exampleApp", [])
+		.controller("defaultCtrl",
+			function($scope) {
+
+			}
+		)
+		.directive("promiseWorker", function($q) {
+			var deferred = $q.defer();
+			return {
+				link : function(scope, element, attrs) {
+					element.find("button").on("click", function(event) {
+						var buttonText = event.target.innerHTML;
+						if (buttonText == "Abort") {
+							deferred.reject("Aborted");
+						} else {
+							deferred.resolve(buttonText);
+						}
+					});
+				},
+				controller : function($scope, $element, $attrs) {
+					this.promise = deferred.promise;
+				}
+			}
+		})
+		.directive("promiseObserver", function() {
+			return {
+				require: "^promiseWorker",
+				link: function (scope, element, attrs, ctrl) {
+					ctrl.promise.then(function (result) {
+						element.text(result);
+					}, function (reason) {
+						element.text("Fail (" + reason + ")");
+					});
+				}
+			}
+		})
+</script>
+</head>
+<body ng-controller="defaultCtrl">
+	<div class="well" promise-worker>
+		<button class="btn btn-primary">Heads</button>
+		<button class="btn btn-primary">Tails</button>
+		<button class="btn btn-primary">Abort</button>
+		Outcome: <span promise-observer></span>
+	</div>
+</body>
+</html>

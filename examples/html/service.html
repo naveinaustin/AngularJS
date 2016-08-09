@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <style>
+  	.filled {
+  		background-color: #ffd;
+  	}
+  	input.ng-invalid.ng-dirty {
+  		border: 1px solid red;
+  	}
+  	.error {
+  		color: red;
+  	}
+  	
+  	ul {
+	    list-style-type: none;
+	}
+  </style>
+  <script src="../js/angular.js"></script>
+  <script>
+  	/* Solution 1 */
+	var app = angular.module('main', []);
+	app.service('Counter', function () {
+		var counter = 1;
+		
+		this.get = function() {
+			return counter;
+		};
+		
+		this.increment = function() {
+			counter++;
+		};
+
+	});
+	app.controller('CounterController', ['$scope', 'Counter',
+	    function($scope, Counter){
+			$scope.get = Counter.get;
+		}
+	]);
+	app.controller('CounterControllerIncrementer', ['$scope', 'Counter',
+   	    function($scope, Counter){
+   			$scope.increment = Counter.increment;
+   		}
+   	]);  
+	
+	/* Solution 2 */
+  	/*  var utils = angular.module('utils',[]);
+  	utils.service('Counter', function () {
+	var counter = 1;		
+		this.get = function() {
+			return counter;
+		};
+		
+		this.increment = function() {
+			counter++;
+		};
+	});
+  	var app = angular.module('main', ['utils']);
+	app.controller('CounterController', ['$scope', 'Counter',
+	    function($scope, Counter){
+			$scope.get = Counter.get;
+		}
+	]);
+	app.controller('CounterControllerIncrementer', ['$scope', 'Counter',
+   	    function($scope, Counter){
+   			$scope.increment = Counter.increment;
+   		}
+   	]);  */
+  </script>
+</head>
+<body>
+	<div ng-app="main" class="panel-body" >
+	 	<div ng-controller="CounterController">{{get()}}</div>
+	 	<div ng-controller="CounterControllerIncrementer">
+	 		<button ng-click="increment()" class="btn btn-primary">Increment</button>
+	 	</div>
+ 	</div>
+</body>
+</html>
+
+<!-- 
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular.min.js"></script>
+-->

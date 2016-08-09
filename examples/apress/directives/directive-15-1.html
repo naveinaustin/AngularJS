@@ -1,0 +1,129 @@
+<html ng-app="exampleApp">
+<head>
+<title>Directives</title>
+<link href="../../css/bootstrap.css" rel="stylesheet" />
+<link href="../../css/bootstrap-theme.css" rel="stylesheet" />
+<script src="../../js/angular.js"></script>
+<script>
+	var exampleApp = angular.module("exampleApp", []).controller("defaultCtrl",
+			function($scope) {
+				$scope.products = [ {
+					name : "Apples",
+					category : "Fruit",
+					price : 1.20,
+					expiry : 10
+				}, {
+					name : "Bananas",
+					category : "Fruit",
+					price : 2.42,
+					expiry : 7
+				}, {
+					name : "Pears",
+					category : "Fruit",
+					price : 2.02,
+					expiry : 6
+				} ];
+				
+				$scope.prods= [ {
+					name : "Apples",
+					category : "Fruit",
+					price : 1.20,
+					expiry : 10
+				}, {
+					name : "Bananas",
+					category : "Fruit",
+					price : 2.42,
+					expiry : 7
+				}, {
+					name : "Pears",
+					category : "Fruit",
+					price : 2.02,
+					expiry : 6
+				} ];
+
+
+				$scope.incrementPrices = function() {
+					for (var i = 0; i < $scope.products.length; i++) {
+						$scope.products[i].price++;
+					}
+					for (var i = 0; i < $scope.prods.length; i++) {
+						$scope.prods[i].price++;
+					}
+				};
+				
+				$scope.addItem = function() {
+					$scope.prods.push({
+						name : "Peach",
+						category : "Fruit",
+						price : 3.02,
+						expiry : 6
+					});
+				};
+			});
+	exampleApp.directive("unorderedListChange", function() {
+		return {
+			restrict: 'AE',
+			scope: {
+				data : '=unorderedListChange'
+			},
+			link: function(scope, element, attrs) {
+
+				var propName = attrs["propertyName"];
+				
+	            scope.$watch('data', function(newVal, oldVal){
+	            	if (angular.isArray(newVal)) {
+	            		element.empty();
+						var listElem = angular.element("<ul>");
+						element.append(listElem);
+						for (var i = 0; i < newVal.length; i++) {
+							listElem.append(angular.element('<li>')
+									.text(scope.$eval(propName, newVal[i])));
+						} 
+					}
+	            }, true);
+
+	        }
+		};
+	});
+	exampleApp.directive("unorderedList", function() {
+		return {
+			restrict: 'AE',
+			link: function(scope, element, attrs) {
+	        	var data = scope[attrs["unorderedList"]];
+	        	scope['data'] = data;
+				var propName = attrs["propertyName"];
+				
+	            scope.$watchCollection(scope.data, function(newVal, oldVal){
+	            	if (angular.isArray(data)) {
+						var listElem = angular.element("<ul>");
+						element.append(listElem);
+						for (var i = 0; i < data.length; i++) {
+							listElem.append(angular.element('<li>')
+									.text(scope.$eval(propName, data[i])));
+						}
+					}
+	            });
+
+	        }
+		};
+	});
+</script>
+</head>
+<body ng-controller="defaultCtrl">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3>Products</h3>
+		</div>
+		<div class="panel-body">
+			<button class="btn btn-primary" ng-click="incrementPrices()">
+				Change Prices</button>
+			<button class="btn btn-primary" ng-click="addItem()">Add</button>
+		</div>
+		<div class="panel-body">
+			<div unordered-list="products" property-name="name"></div>
+			<div unordered-list="products" property-name="price | currency"></div>
+			<div unordered-list-change="prods" property-name="price | currency"></div>
+		</div>
+	</div>
+</body>
+</html>

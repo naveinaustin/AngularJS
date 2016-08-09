@@ -1,0 +1,133 @@
+<html ng-app="exampleApp">
+<head>
+<title>Directives</title>
+<link href="../../css/bootstrap.css" rel="stylesheet" />
+<link href="../../css/bootstrap-theme.css" rel="stylesheet" />
+<script src="../../js/jquery-1.7.1.js"></script>
+<script src="../../js/angular.js"></script>
+<script>
+	var exampleApp = angular.module("exampleApp", []).controller("defaultCtrl",
+
+	function($scope) {
+		$scope.fruit = "Apples";
+
+		$scope.options = [ {
+			id : 1,
+			name : 'Starbuck'
+		}, {
+			id : 2,
+			name : 'Appolo'
+		}, {
+			id : 3,
+			name : 'Saul Tigh'
+		}, {
+			id : 4,
+			name : 'Adama'
+		} ];
+	});
+
+	/* exampleApp.directive("demoDirective", function() {
+		return {
+			restrict: "A",
+			scope: {
+				fruit: '@'
+			},
+			link: function(scope, element, attrs) {
+		
+				var items = element.children();
+				for (var i = 0; i < items.length; i++) {
+					if (items.eq(i).text() == attrs["demoDirective"]) {
+						items.eq(i).css("font-weight", "bold");
+					}
+				}
+				
+				scope.$watch(scope.fruit, function(newVal, oldVal) {
+					console.log(newVal);
+				});
+				
+				scope.fruit="Oranges"
+			}
+		};
+	}); */
+
+	exampleApp.directive("demoDirective", function() {
+		return function(scope, element, attrs) {
+			var items = element.children();
+			for (var i = 0; i < items.length; i++) {
+				if (items.eq(i).text() == attrs["demoDirective"]) {
+					items.eq(i).css("font-weight", "bold");
+				}
+			}
+
+		};
+	});
+
+	exampleApp.directive("demoDirectiveNew", function() {
+		return function(scope, element, attrs) {
+			/* 	var itemList = ["<ul>"];
+				for (var i = 0; i < scope.options.length; i++) {
+					itemList.push("<li>");
+					itemList.push(scope.options[i].name);
+					itemList.push("</li>");
+				} 
+				itemList.push("</ul>");
+				element.append(itemList.join('')); */
+			var listElem = angular.element("<ol>");
+			element.append(listElem);
+			for (var i = 0; i < scope.options.length; i++) {
+				listElem.append(angular.element("<li>").append(
+						angular.element("<span>").text(scope.options[i].name)));
+			}
+		}
+	});
+
+	exampleApp.controller("ctrl", [ '$scope', function($scope) {
+		$scope.options = [ {
+			id : 1,
+			name : 'Starbuck'
+		}, {
+			id : 2,
+			name : 'Appolo'
+		}, {
+			id : 3,
+			name : 'Saul Tigh'
+		}, {
+			id : 4,
+			name : 'Adama'
+		} ];
+
+		$scope.changeMe = function(param) {
+			console.log("changed: " + param.value);
+		};
+	} ])
+</script>
+</head>
+<body ng-controller="defaultCtrl">
+	<h3>
+		Fruit
+		<!-- : <input type="text" value="{{fruit}}" ng-bind="fruit"/> -->
+	</h3>
+	<ol demo-directive="Oranges">
+		<li>Apples</li>
+		<li>Oranges</li>
+		<li>Pears</li>
+	</ol>
+
+	<div demo-directive-new></div>
+
+	<div ng-controller="ctrl">
+		<p>Selected id:{{selected_id}}</p>
+		<p>Selected name:{{selected_name}}</p>
+		<select ng-model="selected_id"
+			ng-options="item.name as item.name for item in options"
+			onChange="angular.element(this).scope().changeMe(this)" ></select>
+
+
+		<select ng-model="selected_id"
+			ng-options="item.name as item.name for item in options"
+			onChange="angular.element(this).scope().changeMe(this)">
+		</select>
+	</div>
+	ng-change="changeMe((options|filter:{id:selected_id})[0].name)"
+</body>
+</html>
